@@ -1,6 +1,6 @@
 #include "converter_json.h"
 
-std::string Converter_JSON::number_to_text(int& number){
+std::string Converter_JSON::number_to_text(int number){
     if(number < 10){
         std::string num_text = "00" + std::to_string(number);
         return num_text;
@@ -13,7 +13,7 @@ std::string Converter_JSON::number_to_text(int& number){
 }
 
 std::vector<std::string> Converter_JSON::get_text_documents(){
-    std::ifstream config_json_file("config.json");
+    std::ifstream config_json_file("../data/config.json");
 
 
     if(!config_json_file.is_open()){
@@ -30,6 +30,8 @@ std::vector<std::string> Converter_JSON::get_text_documents(){
         return {};
     }
 
+    config_json_file.close();
+
 
     if(!j.contains("files")){
         std::cerr << "Error format config json" << std::endl;
@@ -41,7 +43,7 @@ std::vector<std::string> Converter_JSON::get_text_documents(){
 
     for(auto& it : file_paths_vec){
         if(!std::filesystem::exists(it)){
-            std::cerr << "Error file path" << it << std::endl;
+            std::cerr << "Error file path " << it << std::endl;
             documents.push_back("");
             continue;
         }
@@ -56,12 +58,11 @@ std::vector<std::string> Converter_JSON::get_text_documents(){
         documents.push_back(buffer.str());
     }
 
-    config_json_file.close();
     return documents;
 }
 
 int Converter_JSON::get_responses_limit(){
-    std::ifstream config_json_file("config.json");
+    std::ifstream config_json_file("../data/config.json");
 
 
     if(!config_json_file.is_open()){
@@ -94,7 +95,7 @@ int Converter_JSON::get_responses_limit(){
 }
 
 std::vector<std::string> Converter_JSON::get_requests(){
-    std::ifstream requests_json_file("requests.json");
+    std::ifstream requests_json_file("../data/requests.json");
 
     if(!requests_json_file.is_open()){
         std::cerr << "Error requests file path" << std::endl;
@@ -110,6 +111,8 @@ std::vector<std::string> Converter_JSON::get_requests(){
         return {};
     }
 
+    requests_json_file.close();
+
     if(!j.contains("requests")){
         std::cerr << "Error format requests json" << std::endl;
         return {};
@@ -123,15 +126,13 @@ std::vector<std::string> Converter_JSON::get_requests(){
         }
     }
 
-    requests_json_file.close();
-
     return requests_vec;
 }
 
-void Converter_JSON::put_answers(std::vector<std::vector<std::pair<int, float>>>answers){
+void Converter_JSON::put_answers(std::vector<std::vector<relative_index>>answers){
     nlohmann::json requests;
     if(answers.empty()){
-        std::ofstream answers_json_file("answers.json");
+        std::ofstream answers_json_file("../data/answers.json");
         if(!answers_json_file.is_open()){
             std::cerr << "Error answers file path" << std::endl;
             return;
@@ -159,7 +160,7 @@ void Converter_JSON::put_answers(std::vector<std::vector<std::pair<int, float>>>
             result["result"] = "true";
             for(auto& it_answer : it_vec){
                 relevance.push_back({
-                    {"docid", it_answer.first}, {"rank", it_answer.second}  
+                    {"docid", it_answer.doc_id}, {"rank", it_answer.rank}  
                 });
             }   
             result["relevance"] = relevance;
@@ -172,13 +173,14 @@ void Converter_JSON::put_answers(std::vector<std::vector<std::pair<int, float>>>
     output_json["answers"] = requests;
 
 
-    std::ofstream answers_json_file("answers.json");
+    std::ofstream answers_json_file("../data/answers.json");
     if(!answers_json_file.is_open()){
         std::cerr << "Error answers file path" << std::endl;
         return;
     }
 
     answers_json_file << output_json.dump(2);
+    answers_json_file.flush();
     answers_json_file.close();
 
     return;

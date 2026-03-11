@@ -5,7 +5,7 @@ Search_Server::Search_Server(Inverted_Index& idx) : _index(idx){}
 std::mutex mut2;
 Converter_JSON C_J;
 
-void Search_Server::to_words_and_search(const std::string& text, size_t num, std::vector<std::vector<relative_index>>& answers){
+void Search_Server::to_words_and_search(const std::string& text, int num, std::vector<std::vector<relative_index>>& answers){
     if(text == ""){
         std::cerr << "Error text is empty";
         return;
@@ -52,9 +52,6 @@ void Search_Server::to_words_and_search(const std::string& text, size_t num, std
         sorted_list.push_back({it_entry.first, it_entry.second});
     }
 
-    int max_responses = C_J.get_responses_limit();
-    int m = 0;
-
     if(sorted_list.empty()){
         std::cerr << "sorted_list empty" << std::endl;
         return;
@@ -68,6 +65,8 @@ void Search_Server::to_words_and_search(const std::string& text, size_t num, std
         return a.doc_id < b.doc_id;
     });
     
+    int max_responses = C_J.get_responses_limit();
+    int m = 0;
 
     float max_absolut_relative = float(sorted_list[0].count);
     for(auto& it_sortList : sorted_list){ // fill in answers
@@ -87,9 +86,9 @@ std::vector<std::vector<relative_index>> Search_Server::search(const std::vector
     std::vector<std::vector<relative_index>> answers(queries_input.size());
     std::vector<std::thread> threads;
 
-    size_t num = 0;
+    int num = 0;
     for(auto& it : queries_input) {
-        size_t current_num = num;
+        int current_num = num;
         threads.push_back(std::thread([this, &it, current_num, &answers]() { 
             this->to_words_and_search(it, current_num, answers);
         }));

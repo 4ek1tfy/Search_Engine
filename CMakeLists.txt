@@ -58,12 +58,6 @@ target_link_libraries(run_tests
     gtest_main
 )
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data/config.json
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data/requests.json
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data/answers.json
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 enable_testing()
 include(GoogleTest)
