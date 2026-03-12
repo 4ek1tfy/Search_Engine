@@ -57,7 +57,7 @@ void Search_Server::to_words_and_search(const std::string& text, int num, std::v
         return;
     }
 
-    std::sort(sorted_list.begin(), sorted_list.end(), 
+    std::sort(sorted_list.begin(), sorted_list.end(),  
         [](const Entry& a, const Entry& b){
         if(a.count != b.count){
             return a.count > b.count;
@@ -87,7 +87,7 @@ std::vector<std::vector<relative_index>> Search_Server::search(const std::vector
     std::vector<std::thread> threads;
 
     int num = 0;
-    for(auto& it : queries_input) {
+    for(auto& it : queries_input) { // starting threads
         int current_num = num;
         threads.push_back(std::thread([this, &it, current_num, &answers]() { 
             this->to_words_and_search(it, current_num, answers);

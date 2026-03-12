@@ -31,7 +31,7 @@ void Inverted_Index::update_document_base(const std::vector<std::string>& input_
     freq_dictionary.clear();
 
     size_t num = 0;
-    for(auto it : docs){
+    for(auto it : docs){ // starting threads
         size_t current_num = num;
         threads.push_back(std::thread([this, current_num, it](){
             this->to_words_and_update(it, current_num);
@@ -40,7 +40,7 @@ void Inverted_Index::update_document_base(const std::vector<std::string>& input_
     }
 
 
-    for(auto& thread : threads){
+    for(auto& thread : threads){ 
         thread.join();
     }
 
